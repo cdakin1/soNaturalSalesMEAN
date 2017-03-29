@@ -1,4 +1,19 @@
-var app = angular.module("app", []);
+var app = angular.module("app", ['ngRoute']);
+
+app.config(function($routeProvider) {
+  $routeProvider
+    .when('/', {
+      templateUrl: 'index.html',
+      controller: 'appCtrl'
+    })
+    .when('/test', {
+      templateUrl: 'test.html',
+      controller: 'appCtrl'
+    })
+    .otherwise({
+      redirectTo: '/'
+    });
+});
 
 app.controller("appCtrl", function($scope, $http) {
     $scope.posts = [];
