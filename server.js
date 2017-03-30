@@ -55,9 +55,17 @@ app.post('/newUser', function(req, res) {
 		password: body.password
 	});
 	newUser.save(function(err, newDemo) {
-		if(err) return console.error(err);
+		if(err) {
+			res.status(500).end;
+		} else {
+			res.status(200).end();
+		}
 	});
 });
+
+app.post('/login', function(req, res) {
+	// TODO: figure out bcrypt auth check and fill this out
+})
 
 
 
@@ -84,7 +92,6 @@ app.get('/demos', function(req, res) {
 	const month = today.getMonth();
 	Post.find({ month: {$gte: month} }, function(err, posts) {
 		if(err) console.error(err);
-		console.log(posts)
 		res.json(posts);
 	});
 });

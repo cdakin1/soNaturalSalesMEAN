@@ -6,8 +6,12 @@ app.config(function($routeProvider) {
       templateUrl: 'index.html',
       controller: 'appCtrl'
     })
-    .when('/test', {
-      templateUrl: 'test.html',
+    .when('/login', {
+      templateUrl: 'login.html',
+      controller: 'appCtrl'
+    })
+    .when('/signup', {
+      templateUrl: 'signup.html',
       controller: 'appCtrl'
     })
     .otherwise({
@@ -15,7 +19,7 @@ app.config(function($routeProvider) {
     });
 });
 
-app.controller("appCtrl", function($scope, $http) {
+app.controller("appCtrl", function($scope, $http, $location) {
     $scope.posts = [];
     $scope.lineLimitWarning = false;
     $scope.lines = {
@@ -78,4 +82,22 @@ app.controller("appCtrl", function($scope, $http) {
         $scope.lineLimitWarning = false;
       }
     };
+    $scope.login = function() {
+      let user = {};
+      user.username = $scope.username;
+      user.password = $scope.password;
+      console.log(user);
+    }
+    $scope.signup = function() {
+      let newUser = {};
+      if($scope.newPassword !== $scope.confirmPassword) {
+        $scope.passwordMismatch = true;
+      } else {
+        newUser.username = $scope.newUsername;
+        newUser.password = $scope.newPassword;
+        console.log(newUser);
+        $http.post('/newUser', newUser)
+          .then(function(success) {  console.log(success, 'success'); $location.path( "/" ); }, function(err) { console.log(err, 'error') });
+      }
+    }
 });

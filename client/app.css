@@ -60,6 +60,9 @@ p {
   padding-right: 10px;
 }
 
+#myNavbar li {
+  width: 100px;
+}
 
 #demoList {
   padding-left: 10px;
