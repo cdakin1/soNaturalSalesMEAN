@@ -62,7 +62,9 @@ app.controller("appCtrl", function($scope, $http, $location) {
             success.data.forEach(el => {
               const oldHeight = $('.row.content').height();
               //get demo data
-              $scope.posts.push(el);
+              if(el.user === $scope.currentUser) {
+                $scope.posts.push(el);
+              }
               //get totals for company line count
               $scope.lines[el.line].current ? $scope.lines[el.line].current += 1 : $scope.lines[el.line].current = 1;
               const newHeight = oldHeight + 245;

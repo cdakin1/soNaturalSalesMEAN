@@ -140,7 +140,7 @@ app.get('/demos', function(req, res) {
 	// let test;
 	const today = new Date();
 	const month = today.getMonth();
-	Post.find({ month: {$gte: month}, user: currentUser }, function(err, posts) {
+	Post.find({ month: {$gte: month} }, function(err, posts) {
 		if(err) console.error(err);
 		res.json(posts);
 	});
