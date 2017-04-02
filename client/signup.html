@@ -60,6 +60,7 @@
         <input type="submit" value="Signup" /><br />
       </form>
       <span ng-show="passwordMismatch" style="font-size: 12px; color: red;">Passwords must match, please try again.</span>
+      <span ng-show="duplicateUsername" style="font-size: 12px; color: red;">{{signupError}}</span>
     </div>
   </div>
 </div>

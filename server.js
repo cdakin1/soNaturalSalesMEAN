@@ -20,6 +20,7 @@ const Schema = mongoose.Schema;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 
+let currentUser;
 //Users
 // var testUser = new User({
 //     username: 'jmar777',
@@ -52,26 +53,75 @@ app.post('/newUser', function(req, res) {
 	let body = req.body;
 	let newUser = new User({
 		username: body.username,
-		password: body.password
+		password: body.password,
+		isAdmin: false
 	});
-	newUser.save(function(err, newDemo) {
+	newUser.save(function(err, newUser) {
+		console.log(err);
 		if(err) {
-			res.status(500).end;
+			if(err.code === 11000) {
+				return res.status(400).send({
+				   message: 'Username is not available.'
+				});
+			} else {
+				return res.status(400).send({
+					message: 'Unexpected error, please try again or contact the administrator if problem persists.'
+				})
+			}
 		} else {
-			res.status(200).end();
+			return res.status(200).send({ message: 'NICE!'});
 		}
 	});
 });
 
 app.post('/login', function(req, res) {
-	// TODO: figure out bcrypt auth check and fill this out
+	let body = req.body;
+	let un = body.username;
+	let pw = body.password;
+	let admin = body.isAdmin;
+	User.find({ username: un }, function(err, user) {
+		if(err) console.error(err);
+		if(user.length === 0) {
+			return res.status(400).send({
+				message: 'Incorrect username or password, please try again.'
+			});
+		} else {
+			bcrypt.compare(pw, user[0].password, function(err, response) {
+				if(err) {
+					console.error(err);
+					res.status(400).send({
+						message: 'Unexpected error, if problem persists please contact the administrator.'
+					});
+				};
+				if(response) {
+					res.send(true);
+					currentUser = { username: un, isAdmin: admin };
+				} else {
+					res.send(false);
+				};
+			})
+		};
+	})
+});
+
+app.get('/logout', function(req, res) {
+	currentUser = null;
+	res.send(true);
 })
 
+app.get('/currentUser', function(req, res) {
+	if(currentUser) {
+		res.send(currentUser);
+	} else {
+		res.send(false);
+	}
+});
 
 
 //Posts
 
 const postSchema = new Schema({
+	user: String,
 	line: String,
 	store: String,
 	date: Date,
@@ -90,7 +140,7 @@ app.get('/demos', function(req, res) {
 	// let test;
 	const today = new Date();
 	const month = today.getMonth();
-	Post.find({ month: {$gte: month} }, function(err, posts) {
+	Post.find({ month: {$gte: month}, user: currentUser }, function(err, posts) {
 		if(err) console.error(err);
 		res.json(posts);
 	});
@@ -100,6 +150,7 @@ app.get('/demos', function(req, res) {
 app.post('/newDemo', function(req, res) {
 	let demo = req.body;
 	let newDemo = new Post({
+		user: demo.user,
 		line: demo.line,
 		store: demo.store,
 		date: demo.date,
